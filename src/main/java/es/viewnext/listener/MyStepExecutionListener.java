@@ -13,7 +13,7 @@ public class MyStepExecutionListener implements StepExecutionListener {
 
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
-        System.out.println("after step execution... ");
+        System.out.println("After step execution... ");
         return null;
     }
 }

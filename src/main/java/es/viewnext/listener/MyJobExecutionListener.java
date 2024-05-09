@@ -14,7 +14,7 @@ public class MyJobExecutionListener implements JobExecutionListener {
     public void afterJob(JobExecution jobExecution) {
 
         System.out.println("After job execution...");
-        System.out.println("job Status: " + jobExecution.getStatus());
+        System.out.println("Job Status: " + jobExecution.getStatus());
         System.out.println("Job exitstatus: " + jobExecution.getExitStatus());
         jobExecution.setExitStatus(ExitStatus.COMPLETED);
     }
