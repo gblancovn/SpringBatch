@@ -1,0 +1,22 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:batch="http://www.springframework.org/schema/batch"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+                        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+                        ">
+
+    <import resource="../beans/bean-context.xml" />
+
+    <batch:job id="job">
+        <batch:listeners>
+            <batch:listener ref="myJobExecutionListener"></batch:listener>
+        </batch:listeners>
+        <batch:step id="step1">
+            <tasklet ref="tasklet" />
+            <batch:listeners>
+                <batch:listener ref="myStepExecutionListener"></batch:listener>
+            </batch:listeners>
+        </batch:step>
+    </batch:job>
+
+</beans> 
