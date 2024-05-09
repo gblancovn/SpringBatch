@@ -4,14 +4,19 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Utils {
 
-    public static void printSeparator() {
-        for (int i = 0; i < 80; i++) {
-            System.out.print("-");
-        }
+    private static final Logger log = LoggerFactory.getLogger(Utils.class);
 
-        System.out.println("");
+    public static void printSeparator() {
+        String textLine = "";
+        for (int i = 0; i < 80; i++) {
+            textLine = textLine + "-";
+        }
+        log.info(textLine);
     }
 
     public static String getCurrentDate() {

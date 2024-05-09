@@ -5,9 +5,9 @@
     <bean id="dataSource"
         class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-        <property name="url" value="jdbc:mysql://localhost:3307/db" />
+        <property name="url" value="jdbc:mysql://localhost:3306/survdb" />
         <property name="username" value="root" />
-        <property name="password" value="root" />
+        <property name="password" value="An@F#14@City98niju" />
     </bean>
 
     <bean id="jobRepository"
@@ -27,10 +27,14 @@
 
     <bean id="tasklet" class="es.viewnext.tasklet.MyTasklet" />
 
-    <bean id="myJobExecutionListener"
-        class="es.viewnext.listener.MyJobExecutionListener" />
+    <bean id="myJobExecutionListener" class="es.viewnext.listener.MyJobExecutionListener" />
 
     <bean id="myStepExecutionListener"
         class="es.viewnext.listener.MyStepExecutionListener" />
 
+    <bean id="myTaskletExecutionListener" class="es.viewnext.listener.MyTaskletExecutionListener" />
+
+    <bean id="myCreateTableTasklet" class="es.viewnext.tasklet.CreateTableTasklet">
+        <constructor-arg ref="dataSource"/>
+    </bean>
 </beans>

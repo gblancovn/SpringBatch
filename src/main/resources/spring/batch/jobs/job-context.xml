@@ -11,8 +11,16 @@
         <batch:listeners>
             <batch:listener ref="myJobExecutionListener"></batch:listener>
         </batch:listeners>
+        <batch:step id="createTableStep">
+            <tasklet ref="myCreateTableTasklet"/>
+            <batch:next on="COMPLETED" to="step1"/>
+        </batch:step>
         <batch:step id="step1">
-            <tasklet ref="tasklet" />
+            <tasklet ref="tasklet">
+                <batch:listeners>
+                    <batch:listener ref="myTaskletExecutionListener"></batch:listener>
+                </batch:listeners>
+            </tasklet>
             <batch:listeners>
                 <batch:listener ref="myStepExecutionListener"></batch:listener>
             </batch:listeners>

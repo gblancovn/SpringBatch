@@ -1,5 +1,7 @@
 package es.viewnext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -13,6 +15,9 @@ import es.viewnext.util.Utils;
 public class App {
 
     public static void main(String[] args) throws Exception {
+
+        final Logger log = LoggerFactory.getLogger(App.class);
+
         String[] springConfig = { "spring/batch/jobs/job-context.xml" };
 
         ApplicationContext context = new ClassPathXmlApplicationContext(springConfig);
@@ -24,7 +29,7 @@ public class App {
         JobParameters jobParameters = getJobParameters();
 
         JobExecution execution = jobLauncher.run(job, jobParameters);
-        System.out.println("Exit Status : " + execution.getStatus());
+        log.info("Exit Status : " + execution.getStatus());
     }
 
     public static JobParameters getJobParameters() {
