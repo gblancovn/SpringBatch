@@ -13,7 +13,6 @@ public class MyTasklet implements Tasklet {
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         Utils.printSeparator();
         System.out.println("This is a sample example of spring batch");
-        Utils.printSeparator();
         return RepeatStatus.FINISHED;
     }
 }
