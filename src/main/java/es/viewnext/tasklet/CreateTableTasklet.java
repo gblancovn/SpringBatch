@@ -1,5 +1,10 @@
 package es.viewnext.tasklet;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -14,7 +19,9 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CreateTableTasklet implements Tasklet {
 
     private static final Logger log = LoggerFactory.getLogger(MyTasklet.class);
@@ -42,15 +49,17 @@ public class CreateTableTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 
-    private void createTable(Connection connection) throws SQLException {
+    private void createTable(Connection connection) throws SQLException, IOException {
         Statement statement = connection.createStatement();
-        statement.execute("CREATE TABLE PARTICIPANTES (" + "ID_PARTICIPANTE INT NOT NULL, "
-                + "NUMPER VARCHAR(13) DEFAULT NULL, " + "MATRICULA VARCHAR(12) DEFAULT NULL, "
-                + "NIF VARCHAR(18) DEFAULT NULL, " + "NOMBRE VARCHAR(100) DEFAULT NULL, "
-                + "APELLIDO1 VARCHAR(80) DEFAULT NULL, " + "APELLIDO2 VARCHAR(80) DEFAULT NULL, "
-                + "EMAIL VARCHAR(255) DEFAULT NULL, " + "PREFIJO_TELEFONO_MOVIL VARCHAR(5) DEFAULT NULL, "
-                + "TELEFONO_MOVIL VARCHAR(13) DEFAULT NULL, " + "FECHA_INICIO TIMESTAMP DEFAULT NULL, "
-                + "FECHA_FINALIZACION TIMESTAMP DEFAULT NULL, " + "IDIOMA VARCHAR(2) DEFAULT NULL)");
+        InputStream inputStream = getClass().getResourceAsStream("/data.sql");
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+        String query = bufferedReader.readLine();
+        log.info("query " + query);
+        if (query != null && !query.isEmpty()) {
+            statement.execute(query);
+        }
         statement.close();
     }
+
 }

@@ -14,7 +14,7 @@
             <tasklet ref="myCreateTableTasklet" />
             <batch:next on="COMPLETED" to="step1" />
         </batch:step>
-        <batch:step id="step1">
+        <batch:step id="step1" next="step2">
             <tasklet ref="tasklet">
                 <batch:listeners>
                     <batch:listener ref="myTaskletExecutionListener"></batch:listener>
@@ -23,6 +23,13 @@
             <batch:listeners>
                 <batch:listener ref="myStepExecutionListener"></batch:listener>
             </batch:listeners>
+        </batch:step>
+        <batch:step id="step2">
+            <batch:tasklet>
+                <batch:chunk reader="csvFileItemReader" writer="jdbcItemWriter" processor="itemProcessor"
+                    commit-interval="10">
+                </batch:chunk>
+            </batch:tasklet>
         </batch:step>
     </batch:job>
 

@@ -1,8 +1,31 @@
 package es.viewnext.domain;
 
+import java.util.Date;
+
 import net.sf.jsqlparser.expression.DateTimeLiteralExpression.DateTime;
 
 public class Participante {
+
+    public Participante(int idParticipante, String numper, String matricula, String nif, String nombre,
+            String apellido1, String apellido2, String email, String prefijoTelefonoMovil, String telefonoMovil,
+            Date fechaInicio, Date fechaFinalizacion, String idioma) {
+        this.idParticipante = idParticipante;
+        this.numper = numper;
+        this.matricula = matricula;
+        this.nif = nif;
+        this.nombre = nombre;
+        this.apellido1 = apellido1;
+        this.apellido2 = apellido2;
+        this.email = email;
+        this.prefijoTelefonoMovil = prefijoTelefonoMovil;
+        this.telefonoMovil = telefonoMovil;
+        this.fechaInicio = fechaInicio;
+        this.fechaFinalizacion = fechaFinalizacion;
+        this.idioma = idioma;
+    }
+
+    public Participante() {
+    }
 
     private int idParticipante;
     private String numper;
@@ -14,8 +37,8 @@ public class Participante {
     private String email;
     private String prefijoTelefonoMovil;
     private String telefonoMovil;
-    private DateTime fechaInicio;
-    private DateTime fechaFinalizacion;
+    private Date fechaInicio;
+    private Date fechaFinalizacion;
     private String idioma;
 
     public int getIdParticipante() {
@@ -98,19 +121,19 @@ public class Participante {
         this.telefonoMovil = telefonoMovil;
     }
 
-    public DateTime getFechaInicio() {
+    public Date getFechaInicio() {
         return fechaInicio;
     }
 
-    public void setFechaInicio(DateTime fechaInicio) {
+    public void setFechaInicio(Date fechaInicio) {
         this.fechaInicio = fechaInicio;
     }
 
-    public DateTime getFechaFinalizacion() {
+    public Date getFechaFinalizacion() {
         return fechaFinalizacion;
     }
 
-    public void setFechaFinalizacion(DateTime fechaFinalizacion) {
+    public void setFechaFinalizacion(Date fechaFinalizacion) {
         this.fechaFinalizacion = fechaFinalizacion;
     }
 
@@ -121,26 +144,4 @@ public class Participante {
     public void setIdioma(String idioma) {
         this.idioma = idioma;
     }
-
-    public Participante(int idParticipante, String numper, String matricula, String nif, String nombre,
-            String apellido1, String apellido2, String email, String prefijoTelefonoMovil, String telefonoMovil,
-            DateTime fechaInicio, DateTime fechaFinalizacion, String idioma) {
-        this.idParticipante = idParticipante;
-        this.numper = numper;
-        this.matricula = matricula;
-        this.nif = nif;
-        this.nombre = nombre;
-        this.apellido1 = apellido1;
-        this.apellido2 = apellido2;
-        this.email = email;
-        this.prefijoTelefonoMovil = prefijoTelefonoMovil;
-        this.telefonoMovil = telefonoMovil;
-        this.fechaInicio = fechaInicio;
-        this.fechaFinalizacion = fechaFinalizacion;
-        this.idioma = idioma;
-    }
-
-    public Participante() {
-    }
-
 }
