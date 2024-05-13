@@ -1,6 +1,5 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:batch="http://www.springframework.org/schema/batch"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:batch="http://www.springframework.org/schema/batch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
                         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
                         ">
@@ -12,8 +11,8 @@
             <batch:listener ref="myJobExecutionListener"></batch:listener>
         </batch:listeners>
         <batch:step id="createTableStep">
-            <tasklet ref="myCreateTableTasklet"/>
-            <batch:next on="COMPLETED" to="step1"/>
+            <tasklet ref="myCreateTableTasklet" />
+            <batch:next on="COMPLETED" to="step1" />
         </batch:step>
         <batch:step id="step1">
             <tasklet ref="tasklet">
