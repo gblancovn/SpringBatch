@@ -2,8 +2,6 @@ package es.viewnext.domain;
 
 import java.util.Date;
 
-import net.sf.jsqlparser.expression.DateTimeLiteralExpression.DateTime;
-
 public class Participante {
 
     public Participante(int idParticipante, String numper, String matricula, String nif, String nombre,
