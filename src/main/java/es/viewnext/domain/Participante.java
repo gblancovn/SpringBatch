@@ -4,6 +4,20 @@ import java.util.Date;
 
 public class Participante {
 
+    private int idParticipante;
+    private String numper;
+    private String matricula;
+    private String nif;
+    private String nombre;
+    private String apellido1;
+    private String apellido2;
+    private String email;
+    private String prefijoTelefonoMovil;
+    private String telefonoMovil;
+    private Date fechaInicio;
+    private Date fechaFinalizacion;
+    private String idioma;
+
     public Participante(int idParticipante, String numper, String matricula, String nif, String nombre,
             String apellido1, String apellido2, String email, String prefijoTelefonoMovil, String telefonoMovil,
             Date fechaInicio, Date fechaFinalizacion, String idioma) {
@@ -24,20 +38,6 @@ public class Participante {
 
     public Participante() {
     }
-
-    private int idParticipante;
-    private String numper;
-    private String matricula;
-    private String nif;
-    private String nombre;
-    private String apellido1;
-    private String apellido2;
-    private String email;
-    private String prefijoTelefonoMovil;
-    private String telefonoMovil;
-    private Date fechaInicio;
-    private Date fechaFinalizacion;
-    private String idioma;
 
     public int getIdParticipante() {
         return idParticipante;

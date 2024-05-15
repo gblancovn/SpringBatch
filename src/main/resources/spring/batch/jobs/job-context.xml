@@ -1,5 +1,6 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:batch="http://www.springframework.org/schema/batch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:batch="http://www.springframework.org/schema/batch"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
                         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
                         ">
@@ -8,28 +9,31 @@
 
     <batch:job id="job">
         <batch:listeners>
-            <batch:listener ref="myJobExecutionListener"></batch:listener>
+            <batch:listener ref="myJobExecutionListener" />
         </batch:listeners>
-        <batch:step id="createTableStep">
-            <tasklet ref="myCreateTableTasklet" />
-            <batch:next on="COMPLETED" to="step1" />
-        </batch:step>
-        <batch:step id="step1" next="step2">
-            <tasklet ref="tasklet">
-                <batch:listeners>
-                    <batch:listener ref="myTaskletExecutionListener"></batch:listener>
-                </batch:listeners>
-            </tasklet>
+        <batch:step id="step1">
+            <tasklet ref="createTableTasklet" />
+            <batch:next on="COMPLETED" to="step2" />
             <batch:listeners>
-                <batch:listener ref="myStepExecutionListener"></batch:listener>
+                <batch:listener ref="createTableStepExecutionListener" />
             </batch:listeners>
         </batch:step>
-        <batch:step id="step2">
+        <batch:step id="step2" next="step3">
+            <tasklet ref="tasklet">
+            </tasklet>
+            <batch:listeners>
+                <batch:listener ref="myStepExecutionListener" />
+            </batch:listeners>
+        </batch:step>
+        <batch:step id="step3">
             <batch:tasklet>
-                <batch:chunk reader="csvFileItemReader" writer="jdbcItemWriter" processor="itemProcessor"
+                <batch:chunk reader="participanteReader"
+                    processor="participanteProcessor" writer="participanteWriter"
                     commit-interval="10">
                 </batch:chunk>
+                <!-- TODO: Añadir ItemReadListener, ItemProcessListener, ItemWriteListener -->
             </batch:tasklet>
+            <!-- TODO: Añadir StepListener -->
         </batch:step>
     </batch:job>
 

@@ -15,14 +15,14 @@ public class MyStepExecutionListener implements StepExecutionListener {
     @Override
     public void beforeStep(StepExecution stepExecution) {
         Utils.printSeparator();
-        log.info("Befores step execution... ");
+        log.info("PASO 2: INICIO");
         Utils.printSeparator();
     }
 
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
         Utils.printSeparator();
-        log.info("After step execution... ");
+        log.info("PASO 2: FIN");
         Utils.printSeparator();
         return null;
     }

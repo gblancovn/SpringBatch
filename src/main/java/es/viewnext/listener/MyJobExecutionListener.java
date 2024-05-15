@@ -21,6 +21,7 @@ public class MyJobExecutionListener implements JobExecutionListener {
 
     @Override
     public void afterJob(JobExecution jobExecution) {
+        // TODO: Añadir estadíticas job
         Utils.printSeparator();
         log.info("After job execution...");
         Utils.printSeparator();

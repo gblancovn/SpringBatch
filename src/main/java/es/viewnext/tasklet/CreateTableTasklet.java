@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CreateTableTasklet implements Tasklet {
 
-    private static final Logger log = LoggerFactory.getLogger(MyTasklet.class);
+    private static final Logger log = LoggerFactory.getLogger(CreateTableTasklet.class);
 
     @Autowired
     private DataSource dataSource;
@@ -34,21 +34,38 @@ public class CreateTableTasklet implements Tasklet {
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        log.info("Tasklet database check");
+        if (dataSource == null) {
+            log.info("No es posible obtener los datos del origen de tados.");
+        }
+
         Connection connection = dataSource.getConnection();
+
+        if (connection == null) {
+            log.info("No es posible establecer la conexion con base de datos.");
+        }
+
         DatabaseMetaData metaData = connection.getMetaData();
+
+        if (metaData == null) {
+            log.info("No es posible obtener los datos de conexion.");
+        }
+
+        //TODO: Ampliar para mas tablas
 
         boolean tableExists = metaData.getTables(null, null, "PARTICIPANTES", null).next();
 
         if (!tableExists) {
-            createTable(connection);
+            log.info("No existe la tabla. Se crea.");
+            executeScript(connection);
+        } else {
+            log.info("Ya existe la tabla.");
         }
 
         connection.close();
         return RepeatStatus.FINISHED;
     }
 
-    private void createTable(Connection connection) throws SQLException, IOException {
+    private void executeScript(Connection connection) throws SQLException, IOException {
         Statement statement = connection.createStatement();
         InputStream inputStream = getClass().getResourceAsStream("/data.sql");
         InputStreamReader inputStreamReader = new InputStreamReader(inputStream);

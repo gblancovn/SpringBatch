@@ -3,9 +3,9 @@
 
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-        <property name="url" value="jdbc:mysql://localhost:3306/survdb" />
+        <property name="url" value="jdbc:mysql://localhost:3307/db" />
         <property name="username" value="root" />
-        <property name="password" value="An@F#14@City98niju" />
+        <property name="password" value="root" />
     </bean>
 
     <bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean">
@@ -21,19 +21,25 @@
         <property name="jobRepository" ref="jobRepository" />
     </bean>
 
-    <bean id="tasklet" class="es.viewnext.tasklet.MyTasklet" />
+    <!-- LISTENERS -->
 
     <bean id="myJobExecutionListener" class="es.viewnext.listener.MyJobExecutionListener" />
 
+    <bean id="createTableStepExecutionListener" class="es.viewnext.listener.CreateTableStepExecutionListener" />
+
     <bean id="myStepExecutionListener" class="es.viewnext.listener.MyStepExecutionListener" />
 
-    <bean id="myTaskletExecutionListener" class="es.viewnext.listener.MyTaskletExecutionListener" />
+    <!-- TASKLETS -->
 
-    <bean id="myCreateTableTasklet" class="es.viewnext.tasklet.CreateTableTasklet">
+    <bean id="createTableTasklet" class="es.viewnext.tasklet.CreateTableTasklet">
         <constructor-arg ref="dataSource" />
     </bean>
 
-    <bean id="csvFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+    <bean id="tasklet" class="es.viewnext.tasklet.MyTasklet" />
+
+    <!-- READERS -->
+
+    <bean id="participanteReader" class="org.springframework.batch.item.file.FlatFileItemReader">
         <property name="resource" value="classpath:csv/report.csv" />
         <property name="lineMapper">
             <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
@@ -49,9 +55,9 @@
         </property>
     </bean>
 
-    <bean id="itemProcessor" class="es.viewnext.processor.ParticipanteProcessor" />
+    <bean id="participanteProcessor" class="es.viewnext.processor.ParticipanteProcessor" />
 
-    <bean id="jdbcItemWriter" class="org.springframework.batch.item.database.JdbcBatchItemWriter">
+    <bean id="participanteWriter" class="org.springframework.batch.item.database.JdbcBatchItemWriter">
         <property name="dataSource" ref="dataSource"></property>
         <property name="sql"
             value="INSERT INTO participantes (NOMBRE, APELLIDO1, APELLIDO2, EMAIL, IDIOMA, FECHA_INICIO, FECHA_FINALIZACION) VALUES (?,?,?,?,?,?,?)"></property>
