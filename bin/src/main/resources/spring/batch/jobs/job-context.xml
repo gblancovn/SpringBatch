@@ -1,17 +1,40 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:batch="http://www.springframework.org/schema/batch"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
-						http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
-						">
+    xmlns:batch="http://www.springframework.org/schema/batch"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+                        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+                        ">
 
-	<import resource="../beans/bean-context.xml" />
+    <import resource="../beans/bean-context.xml" />
 
-	<bean id="tasklet" class="es.viewnext.MyTasklet" />
+    <batch:job id="job">
+        <batch:listeners>
+            <batch:listener ref="myJobExecutionListener" />
+        </batch:listeners>
+        <batch:step id="step1">
+            <tasklet ref="createTableTasklet" />
+            <batch:next on="COMPLETED" to="step2" />
+            <batch:listeners>
+                <batch:listener ref="createTableStepExecutionListener" />
+            </batch:listeners>
+        </batch:step>
+        <batch:step id="step2" next="step3">
+            <tasklet ref="tasklet">
+            </tasklet>
+            <batch:listeners>
+                <batch:listener ref="myStepExecutionListener" />
+            </batch:listeners>
+        </batch:step>
+        <batch:step id="step3">
+            <batch:tasklet>
+                <batch:chunk reader="participanteReader"
+                    processor="participanteProcessor" writer="participanteWriter"
+                    commit-interval="10">
+                </batch:chunk>
+                <!-- TODO: Añadir ItemReadListener, ItemProcessListener, ItemWriteListener -->
+            </batch:tasklet>
+            <!-- TODO: Añadir StepListener -->
+        </batch:step>
+    </batch:job>
 
-	<batch:job id="job">
-		<batch:step id="step1">
-			<tasklet ref="tasklet" />
-		</batch:step>
-	</batch:job>
 </beans> 

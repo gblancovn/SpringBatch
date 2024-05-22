@@ -34,48 +34,71 @@ public class CreateTableTasklet implements Tasklet {
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+
+        Connection connection = null;
+
         if (dataSource == null) {
             log.info("No es posible obtener los datos del origen de tados.");
         }
 
-        Connection connection = dataSource.getConnection();
+        try {
+            connection = dataSource.getConnection();
 
-        if (connection == null) {
-            log.info("No es posible establecer la conexion con base de datos.");
-        }
+            if (connection == null) {
+                log.info("No es posible establecer la conexion con base de datos.");
+            }
 
-        DatabaseMetaData metaData = connection.getMetaData();
+            DatabaseMetaData metaData = connection.getMetaData();
 
-        if (metaData == null) {
-            log.info("No es posible obtener los datos de conexion.");
-        }
+            if (metaData == null) {
+                log.info("No es posible obtener los datos de conexion.");
+            }
 
-        //TODO: Ampliar para mas tablas
-
-        boolean tableExists = metaData.getTables(null, null, "PARTICIPANTES", null).next();
-
-        if (!tableExists) {
-            log.info("No existe la tabla. Se crea.");
+            log.info("Se creará la tabla si no existe...");
             executeScript(connection);
-        } else {
-            log.info("Ya existe la tabla.");
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        } finally {
+            connection.close();
         }
 
-        connection.close();
         return RepeatStatus.FINISHED;
     }
 
-    private void executeScript(Connection connection) throws SQLException, IOException {
-        Statement statement = connection.createStatement();
-        InputStream inputStream = getClass().getResourceAsStream("/data.sql");
-        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-        String query = bufferedReader.readLine();
-        log.info("query " + query);
-        if (query != null && !query.isEmpty()) {
-            statement.execute(query);
+    private void executeScript(Connection connection) {
+        Statement statement = null;
+        BufferedReader bufferedReader = null;
+        try {
+            statement = connection.createStatement();
+            InputStream inputStream = getClass().getResourceAsStream("/data.sql");
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+            bufferedReader = new BufferedReader(inputStreamReader);
+            String query;
+            while ((query = bufferedReader.readLine()) != null) {
+                log.info("query " + query);
+                statement.execute(query);
+            }
+        } catch (SQLException e) {
+            log.error("Error executing SQL query", e);
+        } catch (IOException e) {
+            log.error("Error reading data.sql file", e);
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    log.error("Error closing statement", e);
+                }
+            }
+            if (bufferedReader != null) {
+                try {
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    log.error("Error closing bufferedReader", e);
+                }
+            }
         }
-        statement.close();
     }
 
 }

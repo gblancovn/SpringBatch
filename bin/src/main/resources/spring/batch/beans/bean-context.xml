@@ -1,27 +1,72 @@
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
 
-	<bean id="dataSource"
-		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<property name="url" value="jdbc:mysql://localhost:3307/db" />
-		<property name="username" value="root" />
-		<property name="password" value="root" />
-	</bean>
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3307/db" />
+        <property name="username" value="root" />
+        <property name="password" value="root" />
+    </bean>
 
-	<bean id="jobRepository"
-		class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean">
-		<property name="dataSource" ref="dataSource" />
-		<property name="transactionManager" ref="transactionManager" />
-		<property name="databaseType" value="mysql" />
-	</bean>
+    <bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="transactionManager" ref="transactionManager" />
+        <property name="databaseType" value="mysql" />
+    </bean>
 
-	<bean id="transactionManager"
-		class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+    <bean id="transactionManager"
+        class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
 
-	<bean id="jobLauncher"
-		class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
-		<property name="jobRepository" ref="jobRepository" />
-	</bean>
+    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+        <property name="jobRepository" ref="jobRepository" />
+    </bean>
+
+    <!-- LISTENERS -->
+
+    <bean id="myJobExecutionListener" class="es.viewnext.listener.MyJobExecutionListener" />
+
+    <bean id="createTableStepExecutionListener" class="es.viewnext.listener.CreateTableStepExecutionListener" />
+
+    <bean id="myStepExecutionListener" class="es.viewnext.listener.MyStepExecutionListener" />
+
+    <!-- TASKLETS -->
+
+    <bean id="createTableTasklet" class="es.viewnext.tasklet.CreateTableTasklet">
+        <constructor-arg ref="dataSource" />
+    </bean>
+
+    <bean id="tasklet" class="es.viewnext.tasklet.MyTasklet" />
+
+    <!-- READERS -->
+
+    <bean id="participanteReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+        <property name="resource" value="classpath:csv/report.csv" />
+        <property name="lineMapper">
+            <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+                <property name="lineTokenizer">
+                    <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+                        <property name="names" value="firstname,lastname,email,language,validFrom,validUntil" />
+                    </bean>
+                </property>
+                <property name="fieldSetMapper">
+                    <bean class="es.viewnext.reader.ParticipanteReader" />
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="participanteProcessor" class="es.viewnext.processor.ParticipanteProcessor" />
+
+    <bean id="participanteWriter" class="org.springframework.batch.item.database.JdbcBatchItemWriter">
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="sql"
+            value="INSERT INTO participantes (NOMBRE, APELLIDO1, APELLIDO2, EMAIL, IDIOMA, FECHA_INICIO, FECHA_FINALIZACION) VALUES (?,?,?,?,?,?,?)"></property>
+        <property name="itemSqlParameterSourceProvider">
+            <bean class="org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider" />
+        </property>
+        <property name="itemPreparedStatementSetter">
+            <bean class="es.viewnext.writer.ParticipanteItemPreparedStatementSetter" />
+        </property>
+    </bean>
+
 </beans>

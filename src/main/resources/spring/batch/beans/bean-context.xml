@@ -3,7 +3,7 @@
 
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-        <property name="url" value="jdbc:mysql://localhost:3307/db" />
+        <property name="url" value="jdbc:mysql://localhost:3306/survdb" />
         <property name="username" value="root" />
         <property name="password" value="root" />
     </bean>
@@ -21,13 +21,31 @@
         <property name="jobRepository" ref="jobRepository" />
     </bean>
 
+    <bean id="estadisticas" class="es.viewnext.domain.Estadistica" />
+
     <!-- LISTENERS -->
 
-    <bean id="myJobExecutionListener" class="es.viewnext.listener.MyJobExecutionListener" />
+    <bean id="job1ExecutionListener" class="es.viewnext.listener.Job1ExecutionListener">
+        <constructor-arg ref="estadisticas" />
+    </bean>
 
     <bean id="createTableStepExecutionListener" class="es.viewnext.listener.CreateTableStepExecutionListener" />
 
     <bean id="myStepExecutionListener" class="es.viewnext.listener.MyStepExecutionListener" />
+
+    <bean id="participanteStepListener" class="es.viewnext.listener.ParticipanteStepExecutionListener" />
+
+    <bean id="participanteReaderListener" class="es.viewnext.listener.ParticipanteReaderListener">
+        <constructor-arg ref="estadisticas" />
+    </bean>
+
+    <bean id="participanteProcessorListener" class="es.viewnext.listener.ParticipanteProcessorListener">
+        <constructor-arg ref="estadisticas" />
+    </bean>
+
+    <bean id="participanteWriterListener" class="es.viewnext.listener.ParticipanteWriterListener">
+        <constructor-arg ref="estadisticas" />
+    </bean>
 
     <!-- TASKLETS -->
 
@@ -55,7 +73,13 @@
         </property>
     </bean>
 
-    <bean id="participanteProcessor" class="es.viewnext.processor.ParticipanteProcessor" />
+    <!-- PROCESSORS -->
+
+    <bean id="participanteProcessor" class="es.viewnext.processor.ParticipanteProcessor">
+        <constructor-arg ref="dataSource" />
+    </bean>
+
+    <!-- WRITERS -->
 
     <bean id="participanteWriter" class="org.springframework.batch.item.database.JdbcBatchItemWriter">
         <property name="dataSource" ref="dataSource"></property>

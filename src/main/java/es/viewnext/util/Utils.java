@@ -55,6 +55,6 @@ public class Utils {
             return null;
         }
 
-        return null;
+        return date.toString();
     }
 }

@@ -1,10 +1,5 @@
 package es.viewnext.reader;
 
-import java.text.ParseException;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.validation.BindException;
@@ -32,7 +27,7 @@ public class ParticipanteReader implements FieldSetMapper<Participante> {
         participante.setIdioma(fieldSet.readString(3));
         participante.setFechaInicio(Utils.format(fieldSet.readString(4)));
         participante.setFechaFinalizacion(Utils.format(fieldSet.readString(5)));
-        
+
         return participante;
     }
 
