@@ -45,7 +45,7 @@ public class AtributoDaoImpl implements AtributoDao {
     public List<Atributo> select(final int idParticipante) {
         try {
             deleteDuplicates();
-            String sql = "SELECT * FROM atributos WHERE (nombre = ? AND apellido1 = ? AND apellido2 = ? AND idioma = ? AND email = ?)";
+            String sql = "SELECT * FROM atributos WHERE (id_participante = ?)";
             return jdbcTemplate.query(sql, new RowMapper<Atributo>() {
                 @Override
                 public Atributo mapRow(java.sql.ResultSet rs, int rowNum) throws java.sql.SQLException {
@@ -61,4 +61,28 @@ public class AtributoDaoImpl implements AtributoDao {
             return Collections.emptyList();
         }
     }
+    
+    public void insert(Atributo atributo) {
+        try {
+            String sql = "SELECT * FROM atributos WHERE (id_participante = ? AND orden = ? AND valor = ?)";
+            List<Atributo> atributos = jdbcTemplate.query(sql, new RowMapper<Atributo>() {
+                @Override
+                public Atributo mapRow(java.sql.ResultSet rs, int rowNum) throws java.sql.SQLException {
+                    Atributo a = new Atributo();
+                    a.setIdParticipante(rs.getInt("id_participante"));
+                    a.setOrden(rs.getInt("orden"));
+                    a.setValor(rs.getString("valor"));
+                    return a;
+                }
+            }, atributo.getIdParticipante(), atributo.getOrden(), atributo.getValor());
+            
+            if (atributos.isEmpty()) {
+                sql = "INSERT INTO atributos (id_participante, orden, valor) VALUES (?, ?, ?)";
+                jdbcTemplate.update(sql, atributo.getIdParticipante(), atributo.getOrden(), atributo.getValor());
+            }
+        } catch (Exception e) {
+            LOG.error("Error ejecutando el query", e);
+        }
+    }
+
 }

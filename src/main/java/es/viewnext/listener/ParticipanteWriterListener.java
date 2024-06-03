@@ -6,6 +6,8 @@ import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.batch.item.Chunk;
 
+import es.viewnext.dao.AtributoDao;
+import es.viewnext.domain.Atributo;
 import es.viewnext.domain.Estadistica;
 import es.viewnext.domain.Participante;
 
@@ -16,8 +18,12 @@ public class ParticipanteWriterListener implements ItemWriteListener<Participant
     @Autowired
     private Estadistica estadistica;
 
-    public ParticipanteWriterListener(Estadistica estadistica) {
+    @Autowired
+    private AtributoDao atributoDao;
+
+    public ParticipanteWriterListener(Estadistica estadistica, AtributoDao atributoDao) {
         this.estadistica = estadistica;
+        this.atributoDao = atributoDao;
     }
 
     @Override
@@ -30,6 +36,9 @@ public class ParticipanteWriterListener implements ItemWriteListener<Participant
             LOG.info("Procesando el participante " + participante.getNombre() + " " + participante.getApellido1() + " "
                     + participante.getApellido2() + " se ha ingresado a la base de datos correctamente.");
             estadistica.setEscriturasCorrectas(estadistica.getEscriturasCorrectas() + 1);
+            for(Atributo atributo: participante.getAtributos()) {
+                atributoDao.insert(atributo);
+            }
         }
     }
 

@@ -15,8 +15,8 @@ import es.viewnext.dao.ParticipanteDao;
 import es.viewnext.domain.Atributo;
 import es.viewnext.domain.Estadistica;
 import es.viewnext.domain.Participante;
-import es.viewnext.domain.Participantes;
 import es.viewnext.util.Utils;
+import es.viewnext.writer.GuardarParticipanteDescartado;
 
 public class ParticipanteProcessor implements ItemProcessor<Participante, Participante> {
 
@@ -32,14 +32,15 @@ public class ParticipanteProcessor implements ItemProcessor<Participante, Partic
     private FlatFileItemReader<Participante> datosPersonalesReader;
 
     @Autowired
-    private Participantes participantesDescartados; // TODO AQUÍ AÑADIR LOS PARTICIPANTES DESCARTADOS
+    private GuardarParticipanteDescartado guardarParticipanteDescartado;
 
     public ParticipanteProcessor(Estadistica estadistica, ParticipanteDao participanteDao,
-            FlatFileItemReader<Participante> datosPersonalesReader, Participantes participantesDescartados) {
+            FlatFileItemReader<Participante> datosPersonalesReader,
+            GuardarParticipanteDescartado guardarParticipanteDescartado) {
         this.estadistica = estadistica;
         this.participanteDao = participanteDao;
         this.datosPersonalesReader = datosPersonalesReader;
-        this.participantesDescartados = participantesDescartados;
+        this.guardarParticipanteDescartado = guardarParticipanteDescartado;
     }
 
     public ParticipanteProcessor() {
@@ -68,6 +69,7 @@ public class ParticipanteProcessor implements ItemProcessor<Participante, Partic
         if (idParticipante == null) {
             idParticipante = 0l;
         }
+
         participante.setIdParticipante(idParticipante.intValue() + 1);
 
         LOG.info("Procesando el participante " + participante.getNombre() + " " + participante.getApellido1() + " "
@@ -102,9 +104,7 @@ public class ParticipanteProcessor implements ItemProcessor<Participante, Partic
                     + ", el email tiene un formato inválido... No se ha podido dar de alta.");
             estadistica.setErroresProceso(estadistica.getErroresProceso() + 1);
 
-            if (participante != null) {
-                participantesDescartados.addParticipante(participante);
-            }
+            guardarParticipanteDescartado.write(participante);
 
             return false;
         }
@@ -125,9 +125,7 @@ public class ParticipanteProcessor implements ItemProcessor<Participante, Partic
                     + participante.getApellido2() + " ya está dado de alta.");
             estadistica.setParticipantesDuplicados(estadistica.getParticipantesDuplicados() + 1);
 
-            if (participante != null) {
-                participantesDescartados.addParticipante(participante);
-            }
+            guardarParticipanteDescartado.write(participante);
 
             return false;
         }
@@ -147,9 +145,7 @@ public class ParticipanteProcessor implements ItemProcessor<Participante, Partic
                     + participante.getApellido2() + " no es mayor de edad y no se puede dar de alta.");
             estadistica.setParticipantesMenoresEdad(estadistica.getParticipantesMenoresEdad() + 1);
 
-            if (participante != null) {
-                participantesDescartados.addParticipante(participante);
-            }
+            guardarParticipanteDescartado.write(participante);
 
             return false;
         }
@@ -158,13 +154,6 @@ public class ParticipanteProcessor implements ItemProcessor<Participante, Partic
         estadistica.setProcesadosCorrectamente(estadistica.getProcesadosCorrectamente() + 1);
 
         return true;
-    }
-
-    // TODO revisar y preguntas si necesitamos un string para explicar el motivo de
-    // pq está descartado o simplemente añadir a descartados
-    @Autowired
-    public void setParticipantesDescartados(Participantes participantesDescartados) {
-        this.participantesDescartados = participantesDescartados;
     }
 
     private Participante buscarParticipantePorEmail(String email) {

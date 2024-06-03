@@ -38,6 +38,7 @@ public class ParticipanteItemPreparedStatementSetter implements ItemPreparedStat
             ps.setString(7, fechaFinStr);
 
             LocalDate fechaNacimiento = participante.getFechaNacimiento();
+
             if (fechaNacimiento != null) {
                 ps.setDate(8, Date.valueOf(fechaNacimiento));
             } else {
@@ -45,6 +46,7 @@ public class ParticipanteItemPreparedStatementSetter implements ItemPreparedStat
             }
 
             ps.setInt(9, participante.getIdParticipante());
+
         } catch (Exception e) {
             LOG.error("Error en preparedStatement: " + e.getMessage());
         }

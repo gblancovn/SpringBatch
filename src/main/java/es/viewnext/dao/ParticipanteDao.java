@@ -10,5 +10,4 @@ public interface ParticipanteDao {
             final String idioma, final String email);
 
     public Long nextId();
-
 }
