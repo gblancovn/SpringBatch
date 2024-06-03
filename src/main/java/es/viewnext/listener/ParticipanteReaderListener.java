@@ -10,7 +10,7 @@ import es.viewnext.domain.Participante;
 
 public class ParticipanteReaderListener implements ItemReadListener<Participante> {
 
-    private static final Logger log = LoggerFactory.getLogger(ParticipanteReaderListener.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ParticipanteReaderListener.class);
 
     @Autowired
     private Estadistica estadistica;
@@ -23,13 +23,14 @@ public class ParticipanteReaderListener implements ItemReadListener<Participante
     public void beforeRead() {
     }
 
-    public void afterRead() {
-        estadistica.setCorrectoLectura(estadistica.getCorrectoLectura() + 1);
+    @Override
+    public void afterRead(Participante participante) {
+        estadistica.setLecturasCorrectas(estadistica.getLecturasCorrectas() + 1);
     }
 
     @Override
     public void onReadError(Exception ex) {
-        log.error("Participante read error: " + ex.getMessage());
-        estadistica.setErrorLectura(estadistica.getErrorLectura() + 1);
+        LOG.error("Participante read error: " + ex.getMessage());
+        estadistica.setErroresLectura(estadistica.getErroresLectura() + 1);
     }
 }

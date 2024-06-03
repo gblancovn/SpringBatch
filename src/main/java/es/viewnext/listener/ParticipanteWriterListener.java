@@ -1,17 +1,17 @@
 package es.viewnext.listener;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.batch.item.Chunk;
 
 import es.viewnext.domain.Estadistica;
+import es.viewnext.domain.Participante;
 
-public class ParticipanteWriterListener implements ItemWriteListener<String> {
+public class ParticipanteWriterListener implements ItemWriteListener<Participante> {
 
-    private static final Logger log = LoggerFactory.getLogger(ParticipanteWriterListener.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ParticipanteWriterListener.class);
 
     @Autowired
     private Estadistica estadistica;
@@ -20,15 +20,25 @@ public class ParticipanteWriterListener implements ItemWriteListener<String> {
         this.estadistica = estadistica;
     }
 
-    public void beforeWrite(List<? extends String> items) {
+    @Override
+    public void beforeWrite(Chunk<? extends Participante> participantes) {
     }
 
-    public void afterWrite(List<? extends String> items) {
-        estadistica.setCorrectoEscritura(estadistica.getCorrectoEscritura() + 1);
+    @Override
+    public void afterWrite(Chunk<? extends Participante> participantes) {
+        for (Participante participante : participantes) {
+            LOG.info("Procesando el participante " + participante.getNombre() + " " + participante.getApellido1() + " "
+                    + participante.getApellido2() + " se ha ingresado a la base de datos correctamente.");
+            estadistica.setEscriturasCorrectas(estadistica.getEscriturasCorrectas() + 1);
+        }
     }
 
-    public void onWriteError(Exception ex, List<? extends String> items) {
-        estadistica.setErrorEcritura(estadistica.getErrorEcritura() + 1);
-        log.error(ex.getMessage());
+    @Override
+    public void onWriteError(Exception ex, Chunk<? extends Participante> participantes) {
+        for (Participante participante : participantes) {
+            estadistica.setErroresEcritura(estadistica.getErroresEscritura() + 1);
+        }
+        LOG.error(ex.getMessage());
     }
+
 }

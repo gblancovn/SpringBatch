@@ -1,80 +1,132 @@
 package es.viewnext.domain;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Estadistica {
 
-    private int errorLectura = 0;
-    private int correctoLectura = 0;
-    private int errorProcesado = 0;
-    private int correctoProcesado = 0;
-    private int errorEcritura = 0;
-    private int correctoEscritura = 0;
+    private static final Logger LOG = LoggerFactory.getLogger(Estadistica.class);
 
-    public Estadistica(int errorLectura, int correctoLectura, int errorProcesado, int correctoProcesado,
-            int errorEcritura, int correctoEscritura) {
-        this.errorLectura = errorLectura;
-        this.correctoLectura = correctoLectura;
-        this.errorProcesado = errorProcesado;
-        this.correctoProcesado = correctoProcesado;
-        this.errorEcritura = errorEcritura;
-        this.correctoEscritura = correctoEscritura;
+    private int erroresLectura = 0;
+    private int lecturasCorrectas = 0;
+    private int erroresProceso = 0;
+    private int procesadosCorrectamente = 0;
+    private int erroresEscritura = 0;
+    private int escriturasCorrectas = 0;
+    private int participantesProcesados = 0;
+    private int participantesMayoresEdad = 0;
+    private int participantesMenoresEdad = 0;
+    private int participantesDuplicados = 0;
+
+    public Estadistica(int erroresLectura, int lecturasCorrectas, int erroresProceso, int procesadosCorrectamente,
+            int erroresEscritura, int escriturasCorrectas, int participantesProcesados, int participantesMayoresEdad,
+            int participantesMenoresEdad, int participantesDuplicados) {
+        this.erroresLectura = erroresLectura;
+        this.lecturasCorrectas = lecturasCorrectas;
+        this.erroresProceso = erroresProceso;
+        this.procesadosCorrectamente = procesadosCorrectamente;
+        this.erroresEscritura = erroresEscritura;
+        this.escriturasCorrectas = escriturasCorrectas;
+        this.participantesProcesados = participantesProcesados;
+        this.participantesMayoresEdad = participantesMayoresEdad;
+        this.participantesMenoresEdad = participantesMenoresEdad;
+        this.participantesDuplicados = participantesDuplicados;
     }
 
     public Estadistica() {
     }
 
-    public int getErrorLectura() {
-        return errorLectura;
+    public void mostrarEstadisticas() {
+        LOG.info("Estadisticas: " + "\n Participantes leídos: " + lecturasCorrectas
+                + "\n Participantes con errores en lectura: " + erroresLectura + "\n Participantes totales procesados: "
+                + participantesProcesados + "\n Participantes procesados correctamente: " + procesadosCorrectamente
+                + "\n Participantes con errores en procesado: " + erroresProceso
+                + "\n Participantes insertados en la base de datos: " + escriturasCorrectas
+                + "\n Participantes no insertados en la base de datos: "
+                + (erroresProceso + erroresEscritura + participantesMenoresEdad + participantesDuplicados)
+                + "\n Participantes con errores al insertar en la base de datos: " + erroresEscritura
+                + "\n Participantes mayores de edad: " + participantesMayoresEdad + "\n Participantes menores de edad: "
+                + participantesMenoresEdad + "\n Participantes duplicados: " + participantesDuplicados);
     }
 
-    public void setErrorLectura(int errorLectura) {
-        this.errorLectura = errorLectura;
+    public int getErroresLectura() {
+        return erroresLectura;
     }
 
-    public int getCorrectoLectura() {
-        return correctoLectura;
+    public void setErroresLectura(int errorLectura) {
+        this.erroresLectura = errorLectura;
     }
 
-    public void setCorrectoLectura(int correctoLectura) {
-        this.correctoLectura = correctoLectura;
+    public int getLecturasCorrectas() {
+        return lecturasCorrectas;
     }
 
-    public int getErrorProcesado() {
-        return errorProcesado;
+    public void setLecturasCorrectas(int correctoLectura) {
+        this.lecturasCorrectas = correctoLectura;
     }
 
-    public void setErrorProcesado(int errorProcesado) {
-        this.errorProcesado = errorProcesado;
+    public int getErroresProceso() {
+        return erroresProceso;
     }
 
-    public int getCorrectoProcesado() {
-        return correctoProcesado;
+    public void setErroresProceso(int errorProcesado) {
+        this.erroresProceso = errorProcesado;
     }
 
-    public void setCorrectoProcesado(int correctoProcesado) {
-        this.correctoProcesado = correctoProcesado;
+    public int getProcesadosCorrectamente() {
+        return procesadosCorrectamente;
     }
 
-    public int getErrorEcritura() {
-        return errorEcritura;
+    public void setProcesadosCorrectamente(int correctoProcesado) {
+        this.procesadosCorrectamente = correctoProcesado;
     }
 
-    public void setErrorEcritura(int errorEcritura) {
-        this.errorEcritura = errorEcritura;
+    public int getErroresEscritura() {
+        return erroresEscritura;
     }
 
-    public int getCorrectoEscritura() {
-        return correctoEscritura;
+    public void setErroresEcritura(int errorEcritura) {
+        this.erroresEscritura = errorEcritura;
     }
 
-    public void setCorrectoEscritura(int correctoEscritura) {
-        this.correctoEscritura = correctoEscritura;
+    public int getEscriturasCorrectas() {
+        return escriturasCorrectas;
     }
 
-    @Override
-    public String toString() {
-        return "\n Estadistica [ \n //LECTURA// \n Error Lectura = " + errorLectura + " \n Correcto Lectura = " + correctoLectura
-                + "\n //PROCESADO//  \n Error Procesado = " + errorProcesado + "\n correcto Procesado = " + correctoProcesado + 
-                "\n //ESCRITURA// \n Error Ecritura = " + errorEcritura + "\n Correcto Escritura = " + correctoEscritura + " ]";
+    public void setEscriturasCorrectas(int correctoEscritura) {
+        this.escriturasCorrectas = correctoEscritura;
+    }
+
+    public int getParticipantesProcesados() {
+        return participantesProcesados;
+    }
+
+    public void setParticipantesProcesados(int participantesProcesados) {
+        this.participantesProcesados = participantesProcesados;
+    }
+
+    public int getParticipantesMayoresEdad() {
+        return participantesMayoresEdad;
+    }
+
+    public void setParticipantesMayoresEdad(int participanteMayorEdad) {
+        this.participantesMayoresEdad = participanteMayorEdad;
+    }
+
+    public int getParticipantesMenoresEdad() {
+        return participantesMenoresEdad;
+    }
+
+    public void setParticipantesMenoresEdad(int participanteMenorEdad) {
+        this.participantesMenoresEdad = participanteMenorEdad;
+    }
+
+    public int getParticipantesDuplicados() {
+        return participantesDuplicados;
+    }
+
+    public void setParticipantesDuplicados(int participanteDuplicado) {
+        this.participantesDuplicados = participanteDuplicado;
     }
 
 }

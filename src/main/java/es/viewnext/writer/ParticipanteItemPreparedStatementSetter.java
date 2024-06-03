@@ -1,8 +1,10 @@
 package es.viewnext.writer;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,12 +14,12 @@ import es.viewnext.domain.Participante;
 
 public class ParticipanteItemPreparedStatementSetter implements ItemPreparedStatementSetter<Participante> {
 
-    private static final Logger log = LoggerFactory.getLogger(ParticipanteItemPreparedStatementSetter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ParticipanteItemPreparedStatementSetter.class);
 
     @Override
     public void setValues(Participante participante, PreparedStatement ps) throws SQLException {
         if (participante == null) {
-            log.info("Participante vacío en ParticipanteItemPreparedStatementSetter");
+            LOG.info("Participante vacío en ParticipanteItemPreparedStatementSetter");
             throw new NullPointerException("Participante cannot be null");
         }
 
@@ -35,10 +37,17 @@ public class ParticipanteItemPreparedStatementSetter implements ItemPreparedStat
             ps.setString(6, fechaInicioStr);
             ps.setString(7, fechaFinStr);
 
+            LocalDate fechaNacimiento = participante.getFechaNacimiento();
+            if (fechaNacimiento != null) {
+                ps.setDate(8, Date.valueOf(fechaNacimiento));
+            } else {
+                ps.setNull(8, java.sql.Types.DATE);
+            }
+
+            ps.setInt(9, participante.getIdParticipante());
         } catch (Exception e) {
-            log.error("Error en preparedStatement: " + e.getMessage());
+            LOG.error("Error en preparedStatement: " + e.getMessage());
         }
-        log.info(ps.toString());
     }
 
 }

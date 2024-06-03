@@ -10,19 +10,19 @@ import es.viewnext.util.Utils;
 
 public class CreateTableStepExecutionListener implements StepExecutionListener {
 
-    private static final Logger log = LoggerFactory.getLogger(CreateTableStepExecutionListener.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CreateTableStepExecutionListener.class);
 
     @Override
     public void beforeStep(StepExecution stepExecution) {
         Utils.printSeparator();
-        log.info("PASO 1: INICIALIZANDO LA BASE DE DATOS");
+        LOG.info("PASO 1: INICIALIZANDO LA BASE DE DATOS");
         Utils.printSeparator();
     }
 
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
         Utils.printSeparator();
-        log.info("PASO 1: FIN ");
+        LOG.info("PASO 1: FIN ");
         Utils.printSeparator();
         return null;
     }

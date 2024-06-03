@@ -3,76 +3,193 @@ package es.viewnext.processor;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 
 import es.viewnext.dao.ParticipanteDao;
-import es.viewnext.dao.factory.ParticipanteDaoFactory;
+import es.viewnext.domain.Atributo;
+import es.viewnext.domain.Estadistica;
 import es.viewnext.domain.Participante;
+import es.viewnext.domain.Participantes;
+import es.viewnext.util.Utils;
 
 public class ParticipanteProcessor implements ItemProcessor<Participante, Participante> {
 
-    private static final Logger log = LoggerFactory.getLogger(ParticipanteProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ParticipanteProcessor.class);
 
     @Autowired
-    private static DataSource dataSource;
+    private Estadistica estadistica;
 
-    public ParticipanteProcessor(DataSource dataSource) {
-        this.dataSource = dataSource;
+    @Autowired
+    private ParticipanteDao participanteDao;
+
+    @Autowired
+    private FlatFileItemReader<Participante> datosPersonalesReader;
+
+    @Autowired
+    private Participantes participantesDescartados; // TODO AQUÍ AÑADIR LOS PARTICIPANTES DESCARTADOS
+
+    public ParticipanteProcessor(Estadistica estadistica, ParticipanteDao participanteDao,
+            FlatFileItemReader<Participante> datosPersonalesReader, Participantes participantesDescartados) {
+        this.estadistica = estadistica;
+        this.participanteDao = participanteDao;
+        this.datosPersonalesReader = datosPersonalesReader;
+        this.participantesDescartados = participantesDescartados;
     }
 
     public ParticipanteProcessor() {
     }
 
-    // TODO descomentar y probar con participantedaofactory el insert de
-    // participante
-    // private static final ParticipanteDao participanteDao =
-    // ParticipanteDaoFactory.getParticipanteDao(dataSource);
-
     @Override
     public Participante process(Participante participante) throws Exception {
         if (participante == null) {
-            log.info("Participante vacío en ParticipanteProcessor");
             return null;
         }
 
-        // TODO: añadir el resto de campos del participante al fichero
         String nombre = participante.getNombre();
         String apellido1 = participante.getApellido1();
         String apellido2 = participante.getApellido2();
         String email = participante.getEmail();
         String idioma = participante.getIdioma();
 
-        // TODO cambiar el participanteProcessorWithoutDAO por el participantedao.select
-        // List<Participante> participantes = participanteDao.select(nombre,
-        // apellido1,apellido2, idioma);
-        ParticipanteProcessorWithoutDAO participanteProcessorWithoutDAO = new ParticipanteProcessorWithoutDAO(
-                dataSource);
-        List<Participante> participantes;
-        try {
-            participantes = participanteProcessorWithoutDAO.select(nombre, apellido1, apellido2, idioma);
-        } catch (Exception e) {
-            log.error("Error con la consulta de participante, mensaje error: ", e);
-            participantes = new ArrayList<>();
-        }
-
         participante.setNombre(nombre.toUpperCase());
         participante.setApellido1(apellido1.toUpperCase());
         participante.setApellido2(apellido2.toUpperCase());
-        participante.setEmail(email.toUpperCase());
         participante.setIdioma(idioma.toUpperCase());
+        participante.setEmail(email.toUpperCase());
 
-        log.info("Procesando el participante " + participante.getNombre() + " " + participante.getApellido1() + " "
+        Long idParticipante = participanteDao.nextId();
+
+        if (idParticipante == null) {
+            idParticipante = 0l;
+        }
+        participante.setIdParticipante(idParticipante.intValue() + 1);
+
+        LOG.info("Procesando el participante " + participante.getNombre() + " " + participante.getApellido1() + " "
                 + participante.getApellido2());
 
-        if (participantes.size() > 0) {
+        estadistica.setParticipantesProcesados(estadistica.getParticipantesProcesados() + 1);
+
+        if (!validarParticipante(participante)) {
             return null;
+        }
+
+        if (participante.getAtributos() != null) {
+            Atributo[] atributosArray = participante.getAtributos();
+            for (Atributo atributo : atributosArray) {
+                if (atributo != null) {
+                    atributo.setIdParticipante(participante.getIdParticipante());
+                }
+            }
         }
 
         return participante;
     }
+
+    public boolean validarParticipante(Participante participante) throws Exception {
+        if (participante == null) {
+            return false;
+        }
+
+        if (!Utils.validateEmail(participante.getEmail())) {
+            LOG.info("Error al procesar el participante: " + participante.getNombre() + " "
+                    + participante.getApellido1() + " " + participante.getApellido2()
+                    + ", el email tiene un formato inválido... No se ha podido dar de alta.");
+            estadistica.setErroresProceso(estadistica.getErroresProceso() + 1);
+
+            if (participante != null) {
+                participantesDescartados.addParticipante(participante);
+            }
+
+            return false;
+        }
+
+        List<Participante> participantes;
+
+        try {
+            participantes = participanteDao.select(participante.getNombre(), participante.getApellido1(),
+                    participante.getApellido2(), participante.getIdioma(), participante.getEmail());
+
+        } catch (Exception e) {
+            LOG.error("Error con la consulta de participante, mensaje error: ", e);
+            participantes = new ArrayList<>();
+        }
+
+        if (participantes != null && participantes.size() > 0) {
+            LOG.info("El participante " + participante.getNombre() + " " + participante.getApellido1() + " "
+                    + participante.getApellido2() + " ya está dado de alta.");
+            estadistica.setParticipantesDuplicados(estadistica.getParticipantesDuplicados() + 1);
+
+            if (participante != null) {
+                participantesDescartados.addParticipante(participante);
+            }
+
+            return false;
+        }
+
+        Participante datosPersonalesParticipante = buscarParticipantePorEmail(participante.getEmail());
+
+        if (datosPersonalesParticipante != null) {
+            participante.setFechaNacimiento(datosPersonalesParticipante.getFechaNacimiento());
+        }
+
+        if (participante.getFechaNacimiento() == null) {
+            return false;
+        }
+
+        if (!Utils.validateAge(participante.getFechaNacimiento())) {
+            LOG.info("El participante " + participante.getNombre() + " " + participante.getApellido1() + " "
+                    + participante.getApellido2() + " no es mayor de edad y no se puede dar de alta.");
+            estadistica.setParticipantesMenoresEdad(estadistica.getParticipantesMenoresEdad() + 1);
+
+            if (participante != null) {
+                participantesDescartados.addParticipante(participante);
+            }
+
+            return false;
+        }
+
+        estadistica.setParticipantesMayoresEdad(estadistica.getParticipantesMayoresEdad() + 1);
+        estadistica.setProcesadosCorrectamente(estadistica.getProcesadosCorrectamente() + 1);
+
+        return true;
+    }
+
+    // TODO revisar y preguntas si necesitamos un string para explicar el motivo de
+    // pq está descartado o simplemente añadir a descartados
+    @Autowired
+    public void setParticipantesDescartados(Participantes participantesDescartados) {
+        this.participantesDescartados = participantesDescartados;
+    }
+
+    private Participante buscarParticipantePorEmail(String email) {
+        if (!StringUtils.hasText(email)) {
+            return null;
+        }
+
+        Participante participante = null;
+
+        try {
+            datosPersonalesReader.open(new ExecutionContext());
+
+            while ((participante = datosPersonalesReader.read()) != null) {
+                if (participante.getEmail().toUpperCase().equals(email)) {
+                    participante.setFechaNacimiento((participante.getFechaNacimiento()));
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+        } finally {
+            datosPersonalesReader.close();
+        }
+
+        return participante;
+    }
+
 }

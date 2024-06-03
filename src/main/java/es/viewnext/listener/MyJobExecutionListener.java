@@ -10,33 +10,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import es.viewnext.domain.Estadistica;
 import es.viewnext.util.*;
 
-public class Job1ExecutionListener implements JobExecutionListener {
+public class MyJobExecutionListener implements JobExecutionListener {
 
-    private static final Logger log = LoggerFactory.getLogger(Job1ExecutionListener.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MyJobExecutionListener.class);
 
     @Autowired
     private Estadistica estadistica;
 
-    public Job1ExecutionListener(Estadistica estadistica) {
+    public MyJobExecutionListener(Estadistica estadistica) {
         this.estadistica = estadistica;
     }
 
     @Override
     public void beforeJob(JobExecution jobExecution) {
         Utils.printSeparator();
-        log.info("Iniciando Job...");
+        LOG.info("Iniciando Job...");
         Utils.printSeparator();
     }
 
     @Override
     public void afterJob(JobExecution jobExecution) {
         Utils.printSeparator();
-        log.info("Job terminado.");
+        LOG.info("Job terminado.");
         Utils.printSeparator();
-        log.info("Job Status: " + jobExecution.getStatus());
-        log.info("Job exitstatus: " + jobExecution.getExitStatus());
+        LOG.info("Job Status: " + jobExecution.getStatus());
+        LOG.info("Job exitstatus: " + jobExecution.getExitStatus());
         Utils.printSeparator();
-        log.info(estadistica.toString());
+        estadistica.mostrarEstadisticas();
         Utils.printSeparator();
         jobExecution.setExitStatus(ExitStatus.COMPLETED);
     }

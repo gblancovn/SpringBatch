@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CreateTableTasklet implements Tasklet {
 
-    private static final Logger log = LoggerFactory.getLogger(CreateTableTasklet.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CreateTableTasklet.class);
 
     @Autowired
     private DataSource dataSource;
@@ -38,27 +38,27 @@ public class CreateTableTasklet implements Tasklet {
         Connection connection = null;
 
         if (dataSource == null) {
-            log.info("No es posible obtener los datos del origen de tados.");
+            LOG.info("No es posible obtener los datos del origen de tados.");
         }
 
         try {
             connection = dataSource.getConnection();
 
             if (connection == null) {
-                log.info("No es posible establecer la conexion con base de datos.");
+                LOG.info("No es posible establecer la conexion con base de datos.");
             }
 
             DatabaseMetaData metaData = connection.getMetaData();
 
             if (metaData == null) {
-                log.info("No es posible obtener los datos de conexion.");
+                LOG.info("No es posible obtener los datos de conexion.");
             }
 
-            log.info("Se creará la tabla si no existe...");
+            LOG.info("Se creará la tabla si no existe...");
             executeScript(connection);
 
         } catch (Exception e) {
-            log.error(e.getMessage());
+            LOG.error(e.getMessage());
         } finally {
             connection.close();
         }
@@ -76,26 +76,26 @@ public class CreateTableTasklet implements Tasklet {
             bufferedReader = new BufferedReader(inputStreamReader);
             String query;
             while ((query = bufferedReader.readLine()) != null) {
-                log.info("query " + query);
+                LOG.info("query " + query);
                 statement.execute(query);
             }
         } catch (SQLException e) {
-            log.error("Error executing SQL query", e);
+            LOG.error("Error executing SQL query", e);
         } catch (IOException e) {
-            log.error("Error reading data.sql file", e);
+            LOG.error("Error reading data.sql file", e);
         } finally {
             if (statement != null) {
                 try {
                     statement.close();
                 } catch (SQLException e) {
-                    log.error("Error closing statement", e);
+                    LOG.error("Error closing statement", e);
                 }
             }
             if (bufferedReader != null) {
                 try {
                     bufferedReader.close();
                 } catch (IOException e) {
-                    log.error("Error closing bufferedReader", e);
+                    LOG.error("Error closing bufferedReader", e);
                 }
             }
         }

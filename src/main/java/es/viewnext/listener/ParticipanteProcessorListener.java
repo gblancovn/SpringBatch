@@ -10,7 +10,7 @@ import es.viewnext.domain.Participante;
 
 public class ParticipanteProcessorListener implements ItemProcessListener<String, String> {
 
-    private static final Logger log = LoggerFactory.getLogger(ParticipanteProcessorListener.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ParticipanteProcessorListener.class);
 
     @Autowired
     private Estadistica estadistica;
@@ -23,11 +23,11 @@ public class ParticipanteProcessorListener implements ItemProcessListener<String
     }
 
     public void afterProcess(Participante participante, Participante result) {
-        estadistica.setCorrectoProcesado(estadistica.getCorrectoProcesado() + 1);
+        estadistica.setProcesadosCorrectamente(estadistica.getProcesadosCorrectamente() + 1);
     }
 
     public void onProcessError(Participante participante, Exception ex) {
-        estadistica.setErrorProcesado(estadistica.getErrorProcesado() + 1);
-        log.error(ex.getMessage());
+        estadistica.setErroresProceso(estadistica.getErroresProceso() + 1);
+        LOG.error(ex.getMessage());
     }
 }

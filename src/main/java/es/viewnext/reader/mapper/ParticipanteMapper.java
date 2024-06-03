@@ -1,13 +1,14 @@
-package es.viewnext.reader;
+package es.viewnext.reader.mapper;
 
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.validation.BindException;
 
+import es.viewnext.domain.Atributo;
 import es.viewnext.domain.Participante;
 import es.viewnext.util.Utils;
 
-public class ParticipanteReader implements FieldSetMapper<Participante> {
+public class ParticipanteMapper implements FieldSetMapper<Participante> {
 
     @Override
     public Participante mapFieldSet(FieldSet fieldSet) throws BindException {
@@ -27,6 +28,19 @@ public class ParticipanteReader implements FieldSetMapper<Participante> {
         participante.setIdioma(fieldSet.readString(3));
         participante.setFechaInicio(Utils.format(fieldSet.readString(4)));
         participante.setFechaFinalizacion(Utils.format(fieldSet.readString(5)));
+
+        if (fieldSet.getFieldCount() > 5) {
+            Atributo[] atributos = new Atributo[fieldSet.getFieldCount() - 6];
+            int orden = 1;
+            for (int i = 6; i < fieldSet.getFieldCount(); i++) {
+                Atributo atributo = new Atributo();
+                atributo.setOrden(orden);
+                atributo.setValor(fieldSet.readString(i));
+                atributos[orden - 1] = atributo;
+                orden++;
+            }
+            participante.setAtributos(atributos);
+        }
 
         return participante;
     }

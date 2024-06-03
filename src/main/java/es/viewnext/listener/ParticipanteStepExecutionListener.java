@@ -10,19 +10,19 @@ import es.viewnext.util.Utils;
 
 public class ParticipanteStepExecutionListener implements StepExecutionListener {
 
-    private static final Logger log = LoggerFactory.getLogger(ParticipanteStepExecutionListener.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ParticipanteStepExecutionListener.class);
 
     @Override
     public void beforeStep(StepExecution stepExecution) {
         Utils.printSeparator();
-        log.info("PASO 3: INSERTAR PARTICIPANTE EN LA BASE DE DATOS");
+        LOG.info("PASO 2: INICIO");
         Utils.printSeparator();
     }
 
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
         Utils.printSeparator();
-        log.info("PASO 3: FIN");
+        LOG.info("PASO 2: FIN");
         Utils.printSeparator();
         return null;
     }

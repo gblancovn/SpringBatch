@@ -8,7 +8,7 @@
 
     <batch:job id="job">
         <batch:listeners>
-            <batch:listener ref="job1ExecutionListener" />
+            <batch:listener ref="myJobExecutionListener" />
         </batch:listeners>
         <batch:step id="step1">
             <tasklet ref="createTableTasklet" />
@@ -17,17 +17,10 @@
                 <batch:listener ref="createTableStepExecutionListener" />
             </batch:listeners>
         </batch:step>
-        <batch:step id="step2" next="step3">
-            <tasklet ref="tasklet">
-            </tasklet>
-            <batch:listeners>
-                <batch:listener ref="myStepExecutionListener" />
-            </batch:listeners>
-        </batch:step>
-        <batch:step id="step3">
+        <batch:step id="step2">
             <batch:tasklet>
                 <batch:chunk reader="participanteReader" processor="participanteProcessor"
-                    writer="participanteWriter" commit-interval="10">
+                    writer="participanteWriter" commit-interval="1">
                 </batch:chunk>
                 <batch:listeners>
                     <batch:listener ref="participanteReaderListener" />
@@ -36,9 +29,32 @@
                 </batch:listeners>
             </batch:tasklet>
             <batch:listeners>
-                <batch:listener ref="participanteStepListener" />
+                <batch:listener ref="participanteStepExecutionListener" />
             </batch:listeners>
         </batch:step>
+<!--         <batch:step id="step2" next="step3"> -->
+<!--             <tasklet ref="readCsvTasklet"> -->
+<!--             </tasklet> -->
+<!--             <batch:listeners> -->
+<!--                 <batch:listener ref="participanteStep2ExecutionListener" /> -->
+<!--             </batch:listeners> -->
+<!--         </batch:step> -->
+<!--         <batch:step id="step3" next="step4"> -->
+<!--             <tasklet ref="writeDuplicatesTasklet"> -->
+<!--             </tasklet> -->
+<!--             <batch:listeners> -->
+<!--                 <batch:listener ref="participanteStep3ExecutionListener" /> -->
+<!--             </batch:listeners> -->
+<!--         </batch:step> -->
+<!--         <batch:step id="step4" next="step5"> -->
+<!--             <batch:tasklet> -->
+<!--                 <batch:chunk reader="participanteBirthDateReader" processor="participanteBirthDateProcessor" -->
+<!--                     writer="participanteBirthDateListWriter" commit-interval="10" /> -->
+<!--             </batch:tasklet> -->
+<!--             <batch:listeners> -->
+<!--                 <batch:listener ref="participanteStep4ExecutionListener" /> -->
+<!--             </batch:listeners> -->
+<!--         </batch:step> -->
     </batch:job>
 
 </beans> 

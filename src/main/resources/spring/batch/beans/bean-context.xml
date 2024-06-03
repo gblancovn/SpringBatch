@@ -8,6 +8,10 @@
         <property name="password" value="root" />
     </bean>
 
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
     <bean id="jobRepository" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean">
         <property name="dataSource" ref="dataSource" />
         <property name="transactionManager" ref="transactionManager" />
@@ -23,17 +27,31 @@
 
     <bean id="estadisticas" class="es.viewnext.domain.Estadistica" />
 
+    <bean id="csvResource" class="org.springframework.core.io.ClassPathResource">
+        <constructor-arg value="csv/report.csv" />
+    </bean>
+
+    <bean id="participanteDao" class="es.viewnext.dao.impl.ParticipanteDaoImpl">
+        <constructor-arg ref="dataSource" />
+    </bean>
+
+    <bean id="atributoDao" class="es.viewnext.dao.impl.AtributoDaoImpl">
+        <constructor-arg ref="dataSource" />
+    </bean>
+
+    <bean id="participantesDescartados" class="es.viewnext.domain.Participantes" scope="singleton" />
+
+
+
     <!-- LISTENERS -->
 
-    <bean id="job1ExecutionListener" class="es.viewnext.listener.Job1ExecutionListener">
+    <bean id="myJobExecutionListener" class="es.viewnext.listener.MyJobExecutionListener">
         <constructor-arg ref="estadisticas" />
     </bean>
 
     <bean id="createTableStepExecutionListener" class="es.viewnext.listener.CreateTableStepExecutionListener" />
 
-    <bean id="myStepExecutionListener" class="es.viewnext.listener.MyStepExecutionListener" />
-
-    <bean id="participanteStepListener" class="es.viewnext.listener.ParticipanteStepExecutionListener" />
+    <bean id="participanteStepExecutionListener" class="es.viewnext.listener.ParticipanteStepExecutionListener" />
 
     <bean id="participanteReaderListener" class="es.viewnext.listener.ParticipanteReaderListener">
         <constructor-arg ref="estadisticas" />
@@ -47,13 +65,23 @@
         <constructor-arg ref="estadisticas" />
     </bean>
 
+
+
     <!-- TASKLETS -->
 
     <bean id="createTableTasklet" class="es.viewnext.tasklet.CreateTableTasklet">
         <constructor-arg ref="dataSource" />
     </bean>
 
-    <bean id="tasklet" class="es.viewnext.tasklet.MyTasklet" />
+    <bean id="readCsvTasklet" class="es.viewnext.tasklet.ReadCsvTasklet">
+        <constructor-arg value="classpath:csv/report.csv" />
+        <constructor-arg ref="estadisticas" />
+    </bean>
+
+    <bean id="writeDuplicatesTasklet" class="es.viewnext.tasklet.WriteDuplicatesTasklet">
+    </bean>
+
+
 
     <!-- READERS -->
 
@@ -63,28 +91,63 @@
             <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
                 <property name="lineTokenizer">
                     <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
-                        <property name="names" value="firstname,lastname,email,language,validFrom,validUntil" />
+                        <property name="delimiter" value="," />
                     </bean>
                 </property>
                 <property name="fieldSetMapper">
-                    <bean class="es.viewnext.reader.ParticipanteReader" />
+                    <bean class="es.viewnext.reader.mapper.ParticipanteMapper" />
                 </property>
             </bean>
         </property>
     </bean>
 
+    <bean id="datosPersonalesReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+        <property name="resource" value="classpath:csv/DatosPersonales.csv" />
+        <property name="lineMapper">
+            <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+                <property name="lineTokenizer">
+                    <bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+                        <property name="delimiter" value="," />
+                    </bean>
+                </property>
+                <property name="fieldSetMapper">
+                    <bean class="es.viewnext.reader.mapper.DatosPersonalesMapper" />
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+
+
     <!-- PROCESSORS -->
 
     <bean id="participanteProcessor" class="es.viewnext.processor.ParticipanteProcessor">
-        <constructor-arg ref="dataSource" />
+        <constructor-arg ref="estadisticas" />
+        <constructor-arg ref="participanteDao" />
+        <constructor-arg ref="datosPersonalesReader" />
+        <constructor-arg ref="participantesDescartados"/>
     </bean>
+
+    <bean id="participanteBirthDateProcessor" class="es.viewnext.processor.ParticipanteBirthDateProcessor" />
+
+
 
     <!-- WRITERS -->
 
-    <bean id="participanteWriter" class="org.springframework.batch.item.database.JdbcBatchItemWriter">
+    <bean id="participanteWriter" class="org.springframework.batch.item.support.CompositeItemWriter">
+        <property name="delegates">
+            <list>
+                <ref bean="participanteJdbcWriter" />
+                <ref bean="atributoWriter" />
+                <ref bean="rejectedParticipanteItemWriter" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="participanteJdbcWriter" class="org.springframework.batch.item.database.JdbcBatchItemWriter">
         <property name="dataSource" ref="dataSource"></property>
         <property name="sql"
-            value="INSERT INTO participantes (NOMBRE, APELLIDO1, APELLIDO2, EMAIL, IDIOMA, FECHA_INICIO, FECHA_FINALIZACION) VALUES (?,?,?,?,?,?,?)"></property>
+            value="INSERT IGNORE INTO participantes (NOMBRE, APELLIDO1, APELLIDO2, EMAIL, IDIOMA, FECHA_INICIO, FECHA_FINALIZACION, FECHA_NACIMIENTO, ID_PARTICIPANTE) VALUES (?,?,?,?,?,?,?,?,?)"></property>
         <property name="itemSqlParameterSourceProvider">
             <bean class="org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider" />
         </property>
@@ -92,5 +155,31 @@
             <bean class="es.viewnext.writer.ParticipanteItemPreparedStatementSetter" />
         </property>
     </bean>
+
+    <!-- TODO POR CULPA DEL BUFFER DE JDBCBATCHITEMWRITER SE INSERTA DUPLICADO EL ULTIMO VALOR A LA BASE DE DATOS -->
+    <bean id="atributoWriter" class="org.springframework.batch.item.database.JdbcBatchItemWriter">
+        <property name="dataSource" ref="dataSource" />
+        <property name="sql"
+            value="INSERT IGNORE INTO atributos (ID_PARTICIPANTE, ORDEN, VALOR) VALUES (?,?,?);" />
+        <property name="itemPreparedStatementSetter">
+            <bean class="es.viewnext.writer.AtributoItemPreparedStatementSetter" />
+        </property>
+    </bean>
+
+    <bean id="rejectedParticipanteItemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+        <property name="resource">
+            <bean class="org.springframework.core.io.FileSystemResource">
+                <constructor-arg value="csv/Descartados.csv" />
+            </bean>
+        </property>
+        <property name="lineAggregator">
+            <bean class="es.viewnext.writer.DescartadosLineAggregator">
+                <constructor-arg ref="participantesDescartados" />
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="participanteBirthDateListWriter" class="es.viewnext.writer.ParticipanteBirthDateListWriter" />
+
 
 </beans>
