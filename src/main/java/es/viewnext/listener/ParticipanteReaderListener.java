@@ -3,7 +3,6 @@ package es.viewnext.listener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ItemReadListener;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import es.viewnext.domain.Estadistica;
 import es.viewnext.domain.Participante;
@@ -12,7 +11,6 @@ public class ParticipanteReaderListener implements ItemReadListener<Participante
 
     private static final Logger LOG = LoggerFactory.getLogger(ParticipanteReaderListener.class);
 
-    @Autowired
     private Estadistica estadistica;
 
     public ParticipanteReaderListener(Estadistica estadistica) {
@@ -21,6 +19,7 @@ public class ParticipanteReaderListener implements ItemReadListener<Participante
 
     @Override
     public void beforeRead() {
+        // document why this method is empty
     }
 
     @Override

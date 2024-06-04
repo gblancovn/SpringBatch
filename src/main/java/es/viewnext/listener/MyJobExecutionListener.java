@@ -5,16 +5,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import es.viewnext.domain.Estadistica;
-import es.viewnext.util.*;
+import es.viewnext.util.Utils;
 
 public class MyJobExecutionListener implements JobExecutionListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(MyJobExecutionListener.class);
 
-    @Autowired
     private Estadistica estadistica;
 
     public MyJobExecutionListener(Estadistica estadistica) {

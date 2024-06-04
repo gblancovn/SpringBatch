@@ -3,7 +3,6 @@ package es.viewnext.listener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ItemWriteListener;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.batch.item.Chunk;
 
 import es.viewnext.dao.AtributoDao;
@@ -15,10 +14,8 @@ public class ParticipanteWriterListener implements ItemWriteListener<Participant
 
     private static final Logger LOG = LoggerFactory.getLogger(ParticipanteWriterListener.class);
 
-    @Autowired
     private Estadistica estadistica;
 
-    @Autowired
     private AtributoDao atributoDao;
 
     public ParticipanteWriterListener(Estadistica estadistica, AtributoDao atributoDao) {
@@ -28,6 +25,7 @@ public class ParticipanteWriterListener implements ItemWriteListener<Participant
 
     @Override
     public void beforeWrite(Chunk<? extends Participante> participantes) {
+      // document why this method is empty
     }
 
     @Override
@@ -36,7 +34,7 @@ public class ParticipanteWriterListener implements ItemWriteListener<Participant
             LOG.info("Procesando el participante " + participante.getNombre() + " " + participante.getApellido1() + " "
                     + participante.getApellido2() + " se ha ingresado a la base de datos correctamente.");
             estadistica.setEscriturasCorrectas(estadistica.getEscriturasCorrectas() + 1);
-            for(Atributo atributo: participante.getAtributos()) {
+            for (Atributo atributo : participante.getAtributos()) {
                 atributo.setValor(atributo.getValor().toUpperCase());
                 atributoDao.insert(atributo);
             }

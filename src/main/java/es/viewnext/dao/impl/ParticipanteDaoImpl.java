@@ -19,10 +19,8 @@ import es.viewnext.domain.Participante;
 @Repository
 public class ParticipanteDaoImpl implements ParticipanteDao {
 
-    @Autowired
     private DataSource dataSource;
 
-    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     private static final Logger LOG = LoggerFactory.getLogger(ParticipanteDaoImpl.class);
@@ -44,8 +42,7 @@ public class ParticipanteDaoImpl implements ParticipanteDao {
      */
     public Long nextId() {
         String query = "SELECT MAX(id_participante) FROM participantes";
-        Long lastId = jdbcTemplate.queryForObject(query, Long.class);
-        return lastId;
+        return jdbcTemplate.queryForObject(query, Long.class);
     }
 
     /**

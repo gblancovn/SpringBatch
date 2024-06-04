@@ -17,10 +17,8 @@ import es.viewnext.domain.Atributo;
 
 public class AtributoDaoImpl implements AtributoDao {
 
-    @Autowired
     private DataSource dataSource;
 
-    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     private static final Logger LOG = LoggerFactory.getLogger(AtributoDaoImpl.class);

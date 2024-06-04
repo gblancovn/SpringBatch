@@ -17,7 +17,6 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,7 +24,6 @@ public class CreateTableTasklet implements Tasklet {
 
     private static final Logger LOG = LoggerFactory.getLogger(CreateTableTasklet.class);
 
-    @Autowired
     private DataSource dataSource;
 
     public CreateTableTasklet(DataSource dataSource) {
@@ -42,16 +40,22 @@ public class CreateTableTasklet implements Tasklet {
         }
 
         try {
-            connection = dataSource.getConnection();
+            if (dataSource != null) {
+                connection = dataSource.getConnection();
+            } else {
+                throw new NullPointerException("dataSource es nulo");
+            }
 
             if (connection == null) {
                 LOG.info("No es posible establecer la conexion con base de datos.");
+                throw new NullPointerException("connection es nulo");
             }
 
             DatabaseMetaData metaData = connection.getMetaData();
 
             if (metaData == null) {
                 LOG.info("No es posible obtener los datos de conexion.");
+                throw new NullPointerException("metaData es nulo");
             }
 
             LOG.info("Se creará la tabla si no existe...");
@@ -60,7 +64,7 @@ public class CreateTableTasklet implements Tasklet {
         } catch (Exception e) {
             LOG.error(e.getMessage());
         } finally {
-            connection.close();
+            if (connection!=null) connection.close();
         }
 
         return RepeatStatus.FINISHED;
@@ -72,40 +76,22 @@ public class CreateTableTasklet implements Tasklet {
      * @param connection la conexión a la base de datos
      */
     private void executeScript(Connection connection) {
-        Statement statement = null;
-        BufferedReader bufferedReader = null;
+        try (Statement statement = connection.createStatement();
+                InputStream inputStream = getClass().getResourceAsStream("/data.sql");
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
 
-        try {
-            statement = connection.createStatement();
-            InputStream inputStream = getClass().getResourceAsStream("/data.sql");
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-            bufferedReader = new BufferedReader(inputStreamReader);
             String query;
-
             while ((query = bufferedReader.readLine()) != null) {
                 LOG.info("query " + query);
-                statement.execute(query);
+                statement.addBatch(query);
             }
+            statement.executeBatch();
 
         } catch (SQLException e) {
             LOG.error("Error executing SQL query", e);
         } catch (IOException e) {
             LOG.error("Error reading data.sql file", e);
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    LOG.error("Error closing statement", e);
-                }
-            }
-            if (bufferedReader != null) {
-                try {
-                    bufferedReader.close();
-                } catch (IOException e) {
-                    LOG.error("Error closing bufferedReader", e);
-                }
-            }
         }
     }
 

@@ -19,9 +19,6 @@ public class GuardarParticipanteDescartado {
 
     private static final Logger LOG = LoggerFactory.getLogger(GuardarParticipanteDescartado.class);
 
-    public GuardarParticipanteDescartado() {
-    }
-
     /**
      * Escribe la información de un participante descartado en un archivo CSV.
      * 

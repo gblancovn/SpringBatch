@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
 import es.viewnext.dao.ParticipanteDao;
@@ -22,16 +21,12 @@ public class ParticipanteProcessor implements ItemProcessor<Participante, Partic
 
     private static final Logger LOG = LoggerFactory.getLogger(ParticipanteProcessor.class);
 
-    @Autowired
     private Estadistica estadistica;
 
-    @Autowired
     private ParticipanteDao participanteDao;
 
-    @Autowired
     private FlatFileItemReader<Participante> datosPersonalesReader;
 
-    @Autowired
     private GuardarParticipanteDescartado guardarParticipanteDescartado;
 
     public ParticipanteProcessor(Estadistica estadistica, ParticipanteDao participanteDao,
@@ -128,7 +123,7 @@ public class ParticipanteProcessor implements ItemProcessor<Participante, Partic
             participantes = new ArrayList<>();
         }
 
-        if (participantes != null && participantes.size() > 0) {
+        if (participantes != null && !participantes.isEmpty()) {
             LOG.info("El participante " + participante.getNombre() + " " + participante.getApellido1() + " "
                     + participante.getApellido2() + " ya está dado de alta.");
             estadistica.setParticipantesDuplicados(estadistica.getParticipantesDuplicados() + 1);
