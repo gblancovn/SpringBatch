@@ -36,6 +36,9 @@ public class Estadistica {
     public Estadistica() {
     }
 
+    /**
+     * Muestra las estadísticas del proceso de lectura, procesamiento y escritura de los participantes.
+     */
     public void mostrarEstadisticas() {
         LOG.info("Estadisticas: " + "\n Participantes leídos: " + lecturasCorrectas
                 + "\n Participantes con errores en lectura: " + erroresLectura + "\n Participantes totales procesados: "
