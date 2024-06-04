@@ -22,6 +22,11 @@ public class GuardarParticipanteDescartado {
     public GuardarParticipanteDescartado() {
     }
 
+    /**
+     * Escribe la información de un participante descartado en un archivo CSV.
+     * 
+     * @param participante el participante a escribir en el archivo
+     */
     public void write(Participante participante) {
         if (participante != null) {
             File tempFile = new File("temp.csv");

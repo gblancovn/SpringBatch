@@ -94,6 +94,13 @@ public class ParticipanteProcessor implements ItemProcessor<Participante, Partic
         return participante;
     }
 
+    /**
+     * Valida un participante según ciertos criterios.
+     * 
+     * @param participante el participante a validar
+     * @return true si el participante es válido, false en caso contrario
+     * @throws Exception si ocurre un error durante el proceso de validación
+     */
     public boolean validarParticipante(Participante participante) throws Exception {
         if (participante == null) {
             return false;
@@ -157,6 +164,12 @@ public class ParticipanteProcessor implements ItemProcessor<Participante, Partic
         return true;
     }
 
+    /**
+     * Busca un participante por su dirección de correo electrónico.
+     * 
+     * @param email la dirección de correo electrónico del participante a buscar
+     * @return el participante encontrado o null si no se encuentra
+     */
     private Participante buscarParticipantePorEmail(String email) {
         if (!StringUtils.hasText(email)) {
             return null;

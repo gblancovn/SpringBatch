@@ -37,12 +37,27 @@ public class ParticipanteDaoImpl implements ParticipanteDao {
 
     }
 
+    /**
+     * Obtiene el próximo ID de participante disponible.
+     * 
+     * @return el próximo ID de participante
+     */
     public Long nextId() {
         String query = "SELECT MAX(id_participante) FROM participantes";
         Long lastId = jdbcTemplate.queryForObject(query, Long.class);
         return lastId;
     }
 
+    /**
+     * Busca participantes que coincidan con los criterios de búsqueda especificados.
+     * 
+     * @param nombre el nombre del participante
+     * @param apellido1 el primer apellido del participante
+     * @param apellido2 el segundo apellido del participante
+     * @param idioma el idioma del participante
+     * @param email el correo electrónico del participante
+     * @return la lista de participantes que coinciden con los criterios de búsqueda
+     */
     public List<Participante> select(final String nombre, final String apellido1, final String apellido2,
             final String idioma, final String email) {
         try {

@@ -66,6 +66,11 @@ public class CreateTableTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 
+    /**
+     * Ejecuta un script SQL contenido en el archivo data.sql.
+     * 
+     * @param connection la conexión a la base de datos
+     */
     private void executeScript(Connection connection) {
         Statement statement = null;
         BufferedReader bufferedReader = null;

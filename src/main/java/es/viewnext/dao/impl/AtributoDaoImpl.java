@@ -35,6 +35,9 @@ public class AtributoDaoImpl implements AtributoDao {
 
     }
 
+    /**
+     * Elimina los atributos duplicados en la base de datos.
+     */
     public void deleteDuplicates() {
         String sql = "DELETE FROM atributos a WHERE a.id_participante IN (SELECT id_participante FROM atributos "
                 + "  GROUP BY id_participante, orden, valor HAVING COUNT(*) > 1) AND a.id IN ("
@@ -42,6 +45,12 @@ public class AtributoDaoImpl implements AtributoDao {
         jdbcTemplate.update(sql);
     }
 
+    /**
+     * Obtiene la lista de atributos asociados a un participante.
+     * 
+     * @param idParticipante el ID del participante
+     * @return la lista de atributos del participante
+     */
     public List<Atributo> select(final int idParticipante) {
         try {
             deleteDuplicates();
@@ -62,6 +71,11 @@ public class AtributoDaoImpl implements AtributoDao {
         }
     }
 
+    /**
+     * Inserta un atributo en la base de datos si no existe ya.
+     * 
+     * @param atributo el atributo a insertar
+     */
     public void insert(Atributo atributo) {
         try {
             String sql = "SELECT * FROM atributos WHERE (id_participante = ? AND orden = ? AND valor = ?)";
