@@ -69,16 +69,19 @@ public class CreateTableTasklet implements Tasklet {
     private void executeScript(Connection connection) {
         Statement statement = null;
         BufferedReader bufferedReader = null;
+
         try {
             statement = connection.createStatement();
             InputStream inputStream = getClass().getResourceAsStream("/data.sql");
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
             bufferedReader = new BufferedReader(inputStreamReader);
             String query;
+
             while ((query = bufferedReader.readLine()) != null) {
                 LOG.info("query " + query);
                 statement.execute(query);
             }
+
         } catch (SQLException e) {
             LOG.error("Error executing SQL query", e);
         } catch (IOException e) {

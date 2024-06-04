@@ -37,6 +37,7 @@ public class ParticipanteWriterListener implements ItemWriteListener<Participant
                     + participante.getApellido2() + " se ha ingresado a la base de datos correctamente.");
             estadistica.setEscriturasCorrectas(estadistica.getEscriturasCorrectas() + 1);
             for(Atributo atributo: participante.getAtributos()) {
+                atributo.setValor(atributo.getValor().toUpperCase());
                 atributoDao.insert(atributo);
             }
         }
@@ -44,9 +45,7 @@ public class ParticipanteWriterListener implements ItemWriteListener<Participant
 
     @Override
     public void onWriteError(Exception ex, Chunk<? extends Participante> participantes) {
-        for (Participante participante : participantes) {
-            estadistica.setErroresEcritura(estadistica.getErroresEscritura() + 1);
-        }
+        estadistica.setErroresEcritura(estadistica.getErroresEscritura() + 1);
         LOG.error(ex.getMessage());
     }
 

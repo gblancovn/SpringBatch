@@ -11,7 +11,9 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import es.viewnext.domain.Atributo;
 import es.viewnext.domain.Participante;
+import es.viewnext.util.Utils;
 
 public class GuardarParticipanteDescartado {
 
@@ -32,15 +34,24 @@ public class GuardarParticipanteDescartado {
                     lines = Files.readAllLines(targetFile.toPath());
                 }
 
-                lines.add(String.format("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"", participante.getNombre(),
+                String atributosString = "";
+
+                for (Atributo atributo : participante.getAtributos()) {
+                    atributosString += ",\"" + atributo.getValor().toUpperCase() + "\"";
+                }
+
+                lines.add(String.format("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"%s", participante.getNombre(),
                         participante.getApellido1() + " " + participante.getApellido2(), participante.getEmail(),
-                        participante.getIdioma(), participante.getFechaInicio(), participante.getFechaFinalizacion()));
+                        participante.getIdioma(), Utils.dateToString(participante.getFechaInicio()),
+                        Utils.dateToString(participante.getFechaFinalizacion()), atributosString));
 
                 try (BufferedWriter bw = new BufferedWriter(new FileWriter(tempFile))) {
                     for (String line : lines) {
                         bw.write(line + "\n");
                     }
+
                     bw.flush();
+
                 }
 
                 if (targetFile.exists()) {

@@ -25,6 +25,7 @@
         <property name="jobRepository" ref="jobRepository" />
     </bean>
 
+
     <bean id="estadisticas" class="es.viewnext.domain.Estadistica" />
 
     <bean id="csvResource" class="org.springframework.core.io.ClassPathResource">

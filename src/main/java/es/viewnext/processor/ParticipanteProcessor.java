@@ -86,6 +86,7 @@ public class ParticipanteProcessor implements ItemProcessor<Participante, Partic
             for (Atributo atributo : atributosArray) {
                 if (atributo != null) {
                     atributo.setIdParticipante(participante.getIdParticipante());
+                    atributo.setValor(atributo.getValor().toUpperCase());
                 }
             }
         }

@@ -81,17 +81,18 @@ public class Utils {
     }
 
     /**
-     * Convierte una fecha en un objeto Date a una cadena de texto.
+     * Convierte una fecha en un objeto Date a una cadena de texto formateada.
      * 
      * @param date la fecha a convertir
-     * @return la fecha como una cadena de texto, o null si la fecha es nula
+     * @return la fecha como una cadena de texto formateada, o null si la fecha es
+     *         nula
      */
     public static String dateToString(final Date date) {
         if (date == null) {
             return null;
         }
 
-        return date.toString();
+        return dateFormat.format(date);
     }
 
     /**

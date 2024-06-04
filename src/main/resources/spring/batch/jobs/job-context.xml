@@ -32,29 +32,6 @@
                 <batch:listener ref="participanteStepExecutionListener" />
             </batch:listeners>
         </batch:step>
-<!--         <batch:step id="step2" next="step3"> -->
-<!--             <tasklet ref="readCsvTasklet"> -->
-<!--             </tasklet> -->
-<!--             <batch:listeners> -->
-<!--                 <batch:listener ref="participanteStep2ExecutionListener" /> -->
-<!--             </batch:listeners> -->
-<!--         </batch:step> -->
-<!--         <batch:step id="step3" next="step4"> -->
-<!--             <tasklet ref="writeDuplicatesTasklet"> -->
-<!--             </tasklet> -->
-<!--             <batch:listeners> -->
-<!--                 <batch:listener ref="participanteStep3ExecutionListener" /> -->
-<!--             </batch:listeners> -->
-<!--         </batch:step> -->
-<!--         <batch:step id="step4" next="step5"> -->
-<!--             <batch:tasklet> -->
-<!--                 <batch:chunk reader="participanteBirthDateReader" processor="participanteBirthDateProcessor" -->
-<!--                     writer="participanteBirthDateListWriter" commit-interval="10" /> -->
-<!--             </batch:tasklet> -->
-<!--             <batch:listeners> -->
-<!--                 <batch:listener ref="participanteStep4ExecutionListener" /> -->
-<!--             </batch:listeners> -->
-<!--         </batch:step> -->
     </batch:job>
 
 </beans> 

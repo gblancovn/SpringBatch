@@ -61,7 +61,7 @@ public class AtributoDaoImpl implements AtributoDao {
             return Collections.emptyList();
         }
     }
-    
+
     public void insert(Atributo atributo) {
         try {
             String sql = "SELECT * FROM atributos WHERE (id_participante = ? AND orden = ? AND valor = ?)";
@@ -75,7 +75,7 @@ public class AtributoDaoImpl implements AtributoDao {
                     return a;
                 }
             }, atributo.getIdParticipante(), atributo.getOrden(), atributo.getValor());
-            
+
             if (atributos.isEmpty()) {
                 sql = "INSERT INTO atributos (id_participante, orden, valor) VALUES (?, ?, ?)";
                 jdbcTemplate.update(sql, atributo.getIdParticipante(), atributo.getOrden(), atributo.getValor());

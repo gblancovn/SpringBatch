@@ -24,17 +24,17 @@ public class MyJobExecutionListener implements JobExecutionListener {
     @Override
     public void beforeJob(JobExecution jobExecution) {
         Utils.printSeparator();
-        LOG.info("Iniciando Job...");
+        LOG.info("INICIANDO JOB...");
         Utils.printSeparator();
     }
 
     @Override
     public void afterJob(JobExecution jobExecution) {
         Utils.printSeparator();
-        LOG.info("Job terminado.");
+        LOG.info("JOB TERMINADO");
         Utils.printSeparator();
-        LOG.info("Job Status: " + jobExecution.getStatus());
-        LOG.info("Job exitstatus: " + jobExecution.getExitStatus());
+        LOG.info("JOB STATUS: " + jobExecution.getStatus());
+        LOG.info("JOB EXITSTATUS: " + jobExecution.getExitStatus());
         Utils.printSeparator();
         estadistica.mostrarEstadisticas();
         Utils.printSeparator();
